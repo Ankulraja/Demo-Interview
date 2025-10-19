@@ -14,7 +14,7 @@ async function Home() {
   const user = await getCurrentUser();
 
   // Only fetch data if user exists
-  const [userInterviews, allInterview] = user?.id 
+  const [userInterviews, allInterview] = user?.id
     ? await Promise.all([
         getInterviewsByUserId(user.id),
         getLatestInterviews({ userId: user.id }),
