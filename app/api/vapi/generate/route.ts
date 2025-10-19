@@ -6,7 +6,32 @@ import { getRandomInterviewCover } from "@/lib/utils";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 
 export async function POST(request: Request) {
-  const { type, role, level, techstack, amount, userid } = await request.json();
+  const body = await request.json();
+  
+  // Handle VAPI's nested data format
+  let data;
+  if (body?.message?.toolCalls?.[0]?.function?.arguments) {
+    // VAPI format: data is nested in message.toolCalls[0].function.arguments
+    data = typeof body.message.toolCalls[0].function.arguments === 'string' 
+      ? JSON.parse(body.message.toolCalls[0].function.arguments)
+      : body.message.toolCalls[0].function.arguments;
+  } else {
+    // Direct format: data is in the root of the request body
+    data = body;
+  }
+  
+  const { type, role, level, techstack, amount, userid } = data;
+
+  // Validate required fields
+  if (!type || !role || !level || !amount || !techstack) {
+    return Response.json(
+      { 
+        success: false, 
+        error: "Missing required fields: type, role, level, amount, techstack" 
+      }, 
+      { status: 400 }
+    );
+  }
 
   try {
     let currentUserId = userid;
