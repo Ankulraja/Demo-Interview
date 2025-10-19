@@ -7,26 +7,33 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 
 export async function POST(request: Request) {
   const { type, role, level, techstack, amount, userid } = await request.json();
-  
+
   try {
     // Get current user from session if userid not provided
     let currentUserId = userid;
-    
+
     if (!currentUserId) {
-      console.log("No userid provided, attempting to get current user from session...");
-      
+      console.log(
+        "No userid provided, attempting to get current user from session..."
+      );
+
       try {
         const user = await getCurrentUser();
-        console.log("getCurrentUser result:", user ? "User found" : "No user found");
-        
+        console.log(
+          "getCurrentUser result:",
+          user ? "User found" : "No user found"
+        );
+
         if (!user) {
           console.log("No authenticated user found in session");
-          
+
           // TEMPORARY WORKAROUND: Use a default user ID for VAPI workflow
           // TODO: Fix VAPI workflow to pass userid or fix session authentication
-          console.log("Using temporary workaround - generating with default user ID");
+          console.log(
+            "Using temporary workaround - generating with default user ID"
+          );
           currentUserId = "temp-vapi-user-" + Date.now();
-          
+
           // Uncomment the lines below to enforce authentication:
           // return Response.json(
           //   {
@@ -36,16 +43,17 @@ export async function POST(request: Request) {
           //   },
           //   { status: 401 }
           // );
+        } else {
+          currentUserId = user.id;
+          console.log("Using user ID from session:", currentUserId);
         }
-        currentUserId = user.id;
-        console.log("Using user ID from session:", currentUserId);
       } catch (authError) {
         console.error("Authentication error:", authError);
         return Response.json(
           {
             success: false,
             error: "Authentication failed. Please provide userid in request.",
-            debug: "Session authentication error occurred."
+            debug: "Session authentication error occurred.",
           },
           { status: 401 }
         );
