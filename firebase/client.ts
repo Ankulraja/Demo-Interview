@@ -27,16 +27,33 @@ let app;
 let auth;
 let db;
 
-if (isClient && hasRequiredConfig) {
-  try {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    auth = getAuth(app);
-    db = getFirestore(app);
-  } catch (error) {
-    console.error('Firebase initialization error:', error);
+if (isClient) {
+  if (hasRequiredConfig) {
+    try {
+      app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+      auth = getAuth(app);
+      db = getFirestore(app);
+    } catch (error) {
+      console.error('Firebase initialization error:', error);
+      // Set to null to prevent further errors
+      app = null;
+      auth = null;
+      db = null;
+    }
+  } else {
+    console.error('Missing required Firebase environment variables:', {
+      apiKey: !!firebaseConfig.apiKey,
+      authDomain: !!firebaseConfig.authDomain,
+      projectId: !!firebaseConfig.projectId,
+      storageBucket: !!firebaseConfig.storageBucket,
+      messagingSenderId: !!firebaseConfig.messagingSenderId,
+      appId: !!firebaseConfig.appId,
+    });
+    // Set to null to prevent further errors
+    app = null;
+    auth = null;
+    db = null;
   }
-} else if (isClient) {
-  console.error('Missing required Firebase environment variables');
 }
 
 export { auth, db };

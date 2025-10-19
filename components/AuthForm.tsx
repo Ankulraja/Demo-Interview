@@ -43,6 +43,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      // Check if Firebase auth is available
+      if (!auth) {
+        toast.error("Firebase authentication is not available. Please check your configuration.");
+        return;
+      }
+
       if (type === "sign-up") {
         const { name, email, password } = data;
 
