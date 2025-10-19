@@ -3,11 +3,25 @@ import { google } from "@ai-sdk/google";
 
 import { db } from "@/firebase/admin";
 import { getRandomInterviewCover } from "@/lib/utils";
+import { getCurrentUser } from "@/lib/actions/auth.action";
 
 export async function POST(request: Request) {
   const { type, role, level, techstack, amount, userid } = await request.json();
 
   try {
+    // Get current user from session if userid not provided
+    let currentUserId = userid;
+    if (!currentUserId) {
+      const user = await getCurrentUser();
+      if (!user) {
+        return Response.json({ 
+          success: false, 
+          error: "User not authenticated. Please provide userid or sign in." 
+        }, { status: 401 });
+      }
+      currentUserId = user.id;
+    }
+
     const { text: questions } = await generateText({
       model: google("gemini-2.0-flash-001"),
       prompt: `Prepare questions for a job interview.
@@ -31,7 +45,7 @@ export async function POST(request: Request) {
       level: level,
       techstack: techstack.split(","),
       questions: JSON.parse(questions),
-      userId: userid,
+      userId: currentUserId, // Use the resolved user ID
       finalized: true,
       coverImage: getRandomInterviewCover(),
       createdAt: new Date().toISOString(),
