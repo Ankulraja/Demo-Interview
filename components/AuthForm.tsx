@@ -45,7 +45,9 @@ const AuthForm = ({ type }: { type: FormType }) => {
     try {
       // Check if Firebase auth is available
       if (!auth) {
-        toast.error("Firebase authentication is not available. Please check your configuration.");
+        toast.error(
+          "Firebase authentication is not available. Please check your configuration."
+        );
         return;
       }
 

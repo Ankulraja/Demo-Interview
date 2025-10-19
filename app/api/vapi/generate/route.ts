@@ -14,10 +14,13 @@ export async function POST(request: Request) {
     if (!currentUserId) {
       const user = await getCurrentUser();
       if (!user) {
-        return Response.json({ 
-          success: false, 
-          error: "User not authenticated. Please provide userid or sign in." 
-        }, { status: 401 });
+        return Response.json(
+          {
+            success: false,
+            error: "User not authenticated. Please provide userid or sign in.",
+          },
+          { status: 401 }
+        );
       }
       currentUserId = user.id;
     }

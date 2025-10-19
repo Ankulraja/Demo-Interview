@@ -19,8 +19,25 @@ const firebaseConfig = {
 };
 
 // Check if we're in the browser and have required config
-const isClient = typeof window !== 'undefined';
-const hasRequiredConfig = firebaseConfig.apiKey && firebaseConfig.authDomain && firebaseConfig.projectId;
+const isClient = typeof window !== "undefined";
+const hasRequiredConfig =
+  firebaseConfig.apiKey &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId;
+
+// Debug logging for environment variables
+if (isClient) {
+  console.log("Firebase Environment Variables Debug:", {
+    apiKey: !!firebaseConfig.apiKey,
+    authDomain: !!firebaseConfig.authDomain,
+    projectId: !!firebaseConfig.projectId,
+    storageBucket: !!firebaseConfig.storageBucket,
+    messagingSenderId: !!firebaseConfig.messagingSenderId,
+    appId: !!firebaseConfig.appId,
+    hasRequiredConfig,
+    isClient,
+  });
+}
 
 // Initialize Firebase only on client side and with required config
 let app;
@@ -34,14 +51,14 @@ if (isClient) {
       auth = getAuth(app);
       db = getFirestore(app);
     } catch (error) {
-      console.error('Firebase initialization error:', error);
+      console.error("Firebase initialization error:", error);
       // Set to null to prevent further errors
       app = null;
       auth = null;
       db = null;
     }
   } else {
-    console.error('Missing required Firebase environment variables:', {
+    console.error("Missing required Firebase environment variables:", {
       apiKey: !!firebaseConfig.apiKey,
       authDomain: !!firebaseConfig.authDomain,
       projectId: !!firebaseConfig.projectId,
