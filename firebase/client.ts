@@ -25,20 +25,6 @@ const hasRequiredConfig =
   firebaseConfig.authDomain &&
   firebaseConfig.projectId;
 
-// Debug logging for environment variables
-if (isClient) {
-  console.log("Firebase Environment Variables Debug:", {
-    apiKey: !!firebaseConfig.apiKey,
-    authDomain: !!firebaseConfig.authDomain,
-    projectId: !!firebaseConfig.projectId,
-    storageBucket: !!firebaseConfig.storageBucket,
-    messagingSenderId: !!firebaseConfig.messagingSenderId,
-    appId: !!firebaseConfig.appId,
-    hasRequiredConfig,
-    isClient,
-  });
-}
-
 // Initialize Firebase only on client side and with required config
 let app;
 let auth;

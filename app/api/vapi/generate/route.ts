@@ -7,7 +7,7 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 
 export async function POST(request: Request) {
   const { type, role, level, techstack, amount, userid } = await request.json();
-
+  console.log("Hello there !! ");
   try {
     // Get current user from session if userid not provided
     let currentUserId = userid;
