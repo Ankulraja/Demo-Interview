@@ -9,57 +9,26 @@ export async function POST(request: Request) {
   const { type, role, level, techstack, amount, userid } = await request.json();
 
   try {
-    // Get current user from session if userid not provided
     let currentUserId = userid;
 
     if (!currentUserId) {
-      console.log(
-        "No userid provided, attempting to get current user from session..."
-      );
-
       try {
         const user = await getCurrentUser();
-        console.log(
-          "getCurrentUser result:",
-          user ? "User found" : "No user found"
-        );
-
+        
         if (!user) {
-          console.log("No authenticated user found in session");
-
-          // TEMPORARY WORKAROUND: Use a default user ID for VAPI workflow
-          // TODO: Fix VAPI workflow to pass userid or fix session authentication
-          console.log(
-            "Using temporary workaround - generating with default user ID"
-          );
           currentUserId = "temp-vapi-user-" + Date.now();
-
-          // Uncomment the lines below to enforce authentication:
-          // return Response.json(
-          //   {
-          //     success: false,
-          //     error: "User authentication required. Please ensure you are signed in or provide userid in the request.",
-          //     debug: "Session-based authentication failed. This usually means: 1) User is not signed in, 2) Session expired, or 3) VAPI workflow needs to pass userid parameter."
-          //   },
-          //   { status: 401 }
-          // );
         } else {
           currentUserId = user.id;
-          console.log("Using user ID from session:", currentUserId);
         }
-      } catch (authError) {
-        console.error("Authentication error:", authError);
+      } catch {
         return Response.json(
           {
             success: false,
             error: "Authentication failed. Please provide userid in request.",
-            debug: "Session authentication error occurred.",
           },
           { status: 401 }
         );
       }
-    } else {
-      console.log("Using provided userid:", currentUserId);
     }
 
     const { text: questions } = await generateText({
@@ -85,7 +54,7 @@ export async function POST(request: Request) {
       level: level,
       techstack: techstack.split(","),
       questions: JSON.parse(questions),
-      userId: currentUserId, // Use the resolved user ID
+      userId: currentUserId,
       finalized: true,
       coverImage: getRandomInterviewCover(),
       createdAt: new Date().toISOString(),
@@ -94,9 +63,8 @@ export async function POST(request: Request) {
     await db.collection("interviews").add(interview);
 
     return Response.json({ success: true }, { status: 200 });
-  } catch (error) {
-    console.error("Error:", error);
-    return Response.json({ success: false, error: error }, { status: 500 });
+  } catch {
+    return Response.json({ success: false, error: "Internal server error" }, { status: 500 });
   }
 }
 
