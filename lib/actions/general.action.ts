@@ -77,6 +77,12 @@ export async function getFeedbackByInterviewId(
 ): Promise<Feedback | null> {
   const { interviewId, userId } = params;
 
+  // Validate required parameters
+  if (!interviewId || !userId) {
+    console.error("Missing required parameters: interviewId or userId");
+    return null;
+  }
+
   const querySnapshot = await db
     .collection("feedback")
     .where("interviewId", "==", interviewId)
@@ -94,6 +100,12 @@ export async function getLatestInterviews(
   params: GetLatestInterviewsParams
 ): Promise<Interview[] | null> {
   const { userId, limit = 20 } = params;
+
+  // Validate required parameters
+  if (!userId) {
+    console.error("Missing required parameter: userId");
+    return null;
+  }
 
   // Get finalized interviews without ordering to avoid index requirement
   const interviews = await db
@@ -122,6 +134,12 @@ export async function getLatestInterviews(
 export async function getInterviewsByUserId(
   userId: string
 ): Promise<Interview[] | null> {
+  // Validate required parameters
+  if (!userId) {
+    console.error("Missing required parameter: userId");
+    return null;
+  }
+
   const interviews = await db
     .collection("interviews")
     .where("userId", "==", userId)
