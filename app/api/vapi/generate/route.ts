@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     if (!currentUserId) {
       try {
         const user = await getCurrentUser();
-        
+
         if (!user) {
           currentUserId = "temp-vapi-user-" + Date.now();
         } else {
@@ -64,7 +64,10 @@ export async function POST(request: Request) {
 
     return Response.json({ success: true }, { status: 200 });
   } catch {
-    return Response.json({ success: false, error: "Internal server error" }, { status: 500 });
+    return Response.json(
+      { success: false, error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
